@@ -1,263 +1,143 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--Created with JFLAP 6.4.--><structure>&#13;
-	<type>fa</type>&#13;
-	<automaton>&#13;
-		<!--The list of states.-->&#13;
-		<state id="0" name="q0">&#13;
-			<x>100.0</x>&#13;
-			<y>400.0</y>&#13;
-			<initial/>&#13;
-		</state>&#13;
-		<state id="1" name="q1 (Delim: :)">&#13;
-			<x>72.0</x>&#13;
-			<y>79.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<state id="2" name="q2 (Atrib: :=)">&#13;
-			<x>183.0</x>&#13;
-			<y>70.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<state id="3" name="q3 (OpRelMenor)">&#13;
-			<x>131.0</x>&#13;
-			<y>138.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<state id="4" name="q4 (OpRelMenorIgual)">&#13;
-			<x>267.0</x>&#13;
-			<y>124.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<state id="5" name="q5 (OpRelMaior)">&#13;
-			<x>181.0</x>&#13;
-			<y>187.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<state id="6" name="q6 (OpRelMaiorIgual)">&#13;
-			<x>338.0</x>&#13;
-			<y>176.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<state id="7" name="q7 (espera =)">&#13;
-			<x>233.0</x>&#13;
-			<y>232.0</y>&#13;
-		</state>&#13;
-		<state id="8" name="q8 (OpRelIgual)">&#13;
-			<x>409.0</x>&#13;
-			<y>242.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<state id="9" name="q9 (espera =)">&#13;
-			<x>264.0</x>&#13;
-			<y>293.0</y>&#13;
-		</state>&#13;
-		<state id="10" name="q10 (OpRelDif)">&#13;
-			<x>420.0</x>&#13;
-			<y>310.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<state id="11" name="q11 (OpAritMult: *)">&#13;
-			<x>280.0</x>&#13;
-			<y>352.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<state id="12" name="q12 (OpAritDiv: /)">&#13;
-			<x>286.0</x>&#13;
-			<y>406.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<state id="13" name="q13 (OpAritSoma: +)">&#13;
-			<x>276.0</x>&#13;
-			<y>460.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<state id="14" name="q14 (OpAritSub: -)">&#13;
-			<x>253.0</x>&#13;
-			<y>518.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<state id="15" name="q15 (AbrePar: ()">&#13;
-			<x>254.0</x>&#13;
-			<y>606.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<state id="16" name="q16 (FechaPar: ))">&#13;
-			<x>265.0</x>&#13;
-			<y>705.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<state id="17" name="q17 (NumInt)">&#13;
-			<x>235.0</x>&#13;
-			<y>781.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<state id="18" name="q18 (espera dígito após ponto)">&#13;
-			<x>323.0</x>&#13;
-			<y>797.0</y>&#13;
-		</state>&#13;
-		<state id="19" name="q19 (NumReal)">&#13;
-			<x>510.0</x>&#13;
-			<y>853.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<state id="20" name="q20 (lendo texto)">&#13;
-			<x>209.0</x>&#13;
-			<y>924.0</y>&#13;
-		</state>&#13;
-		<state id="21" name="q21 (Cadeia)">&#13;
-			<x>324.0</x>&#13;
-			<y>918.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<state id="22" name="q22 (Var)">&#13;
-			<x>122.0</x>&#13;
-			<y>909.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<state id="23" name="q23 (PalavraChave / OpBool)">&#13;
-			<x>65.0</x>&#13;
-			<y>996.0</y>&#13;
-			<final/>&#13;
-		</state>&#13;
-		<!--The list of transitions.-->&#13;
-		<transition>&#13;
-			<from>0</from>&#13;
-			<to>13</to>&#13;
-			<read>+</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>0</from>&#13;
-			<to>23</to>&#13;
-			<read>[A-Z]</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>18</from>&#13;
-			<to>19</to>&#13;
-			<read>[0-9]</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>17</from>&#13;
-			<to>17</to>&#13;
-			<read>[0-9]</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>19</from>&#13;
-			<to>19</to>&#13;
-			<read>[0-9]</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>0</from>&#13;
-			<to>22</to>&#13;
-			<read>[a-z]</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>0</from>&#13;
-			<to>20</to>&#13;
-			<read>"</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>20</from>&#13;
-			<to>21</to>&#13;
-			<read>"</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>0</from>&#13;
-			<to>11</to>&#13;
-			<read>*</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>7</from>&#13;
-			<to>8</to>&#13;
-			<read>=</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>0</from>&#13;
-			<to>15</to>&#13;
-			<read>(</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>23</from>&#13;
-			<to>23</to>&#13;
-			<read>[A-Z]</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>0</from>&#13;
-			<to>1</to>&#13;
-			<read>:</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>0</from>&#13;
-			<to>14</to>&#13;
-			<read>-</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>0</from>&#13;
-			<to>12</to>&#13;
-			<read>/</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>3</from>&#13;
-			<to>4</to>&#13;
-			<read>=</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>17</from>&#13;
-			<to>18</to>&#13;
-			<read>.</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>22</from>&#13;
-			<to>22</to>&#13;
-			<read>[a-zA-Z0-9]</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>0</from>&#13;
-			<to>5</to>&#13;
-			<read>&gt;</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>9</from>&#13;
-			<to>10</to>&#13;
-			<read>=</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>0</from>&#13;
-			<to>7</to>&#13;
-			<read>=</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>0</from>&#13;
-			<to>17</to>&#13;
-			<read>[0-9]</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>0</from>&#13;
-			<to>9</to>&#13;
-			<read>!</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>0</from>&#13;
-			<to>3</to>&#13;
-			<read>&lt;</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>20</from>&#13;
-			<to>20</to>&#13;
-			<read>[^"]</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>5</from>&#13;
-			<to>6</to>&#13;
-			<read>=</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>1</from>&#13;
-			<to>2</to>&#13;
-			<read>=</read>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>0</from>&#13;
-			<to>16</to>&#13;
-			<read>)</read>&#13;
-		</transition>&#13;
-	</automaton>&#13;
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- AUTOMATO FINITO DETERMINISTICO (AFD) COMPLETO DA LINGUAGEM GYH -->
+<!-- Organização em grade horizontal/arborescente para evitar poluição visual no JFLAP -->
+<structure>
+	<type>fa</type>
+	<automaton>
+		<state id="0" name="q0"><x>100.0</x><y>910.0</y><initial/></state>
+		<state id="1" name="q1 (Delim: :)"><x>300.0</x><y>100.0</y><final/></state>
+		<state id="2" name="q2 (Atrib: :=)"><x>500.0</x><y>100.0</y><final/></state>
+		<state id="3" name="q3 (OpRelMenor: &lt;)"><x>300.0</x><y>170.0</y><final/></state>
+		<state id="4" name="q4 (OpRelMenorIgual: &lt;=)"><x>500.0</x><y>170.0</y><final/></state>
+		<state id="5" name="q5 (OpRelMaior: &gt;)"><x>300.0</x><y>240.0</y><final/></state>
+		<state id="6" name="q6 (OpRelMaiorIgual: &gt;=)"><x>500.0</x><y>240.0</y><final/></state>
+		<state id="7" name="q7 (espera =)"><x>300.0</x><y>310.0</y></state>
+		<state id="8" name="q8 (OpRelIgual: ==)"><x>500.0</x><y>310.0</y><final/></state>
+		<state id="9" name="q9 (espera =)"><x>300.0</x><y>380.0</y></state>
+		<state id="10" name="q10 (OpRelDif: !=)"><x>500.0</x><y>380.0</y><final/></state>
+		<state id="11" name="q11 (OpAritMult: *)"><x>300.0</x><y>450.0</y><final/></state>
+		<state id="12" name="q12 (OpAritDiv: /)"><x>300.0</x><y>520.0</y><final/></state>
+		<state id="13" name="q13 (OpAritSoma: +)"><x>300.0</x><y>590.0</y><final/></state>
+		<state id="14" name="q14 (OpAritSub: -)"><x>300.0</x><y>660.0</y><final/></state>
+		<state id="15" name="q15 (AbrePar: ()"><x>300.0</x><y>730.0</y><final/></state>
+		<state id="16" name="q16 (FechaPar: ))"><x>300.0</x><y>800.0</y><final/></state>
+		<state id="17" name="q17 (NumInt)"><x>300.0</x><y>870.0</y><final/></state>
+		<state id="18" name="q18 (espera digito)"><x>500.0</x><y>870.0</y></state>
+		<state id="19" name="q19 (NumReal)"><x>700.0</x><y>870.0</y><final/></state>
+		<state id="20" name="q20 (lendo string)"><x>300.0</x><y>940.0</y></state>
+		<state id="21" name="q21 (Cadeia)"><x>500.0</x><y>940.0</y><final/></state>
+		<state id="22" name="q22 (Var)"><x>300.0</x><y>1010.0</y><final/></state>
+		<state id="23" name="q_d"><x>300.0</x><y>1080.0</y></state>
+		<state id="24" name="q_de"><x>450.0</x><y>1080.0</y></state>
+		<state id="25" name="q_dec (PCDec)"><x>600.0</x><y>1080.0</y><final/></state>
+		<state id="26" name="q_e (OpBoolE)"><x>300.0</x><y>1150.0</y><final/></state>
+		<state id="27" name="q_en"><x>450.0</x><y>1150.0</y></state>
+		<state id="28" name="q_enq"><x>600.0</x><y>1150.0</y></state>
+		<state id="29" name="q_enqt"><x>750.0</x><y>1150.0</y></state>
+		<state id="30" name="q_enqto (PCEnqto)"><x>900.0</x><y>1150.0</y><final/></state>
+		<state id="31" name="q_ent"><x>600.0</x><y>1220.0</y></state>
+		<state id="32" name="q_enta"><x>750.0</x><y>1220.0</y></state>
+		<state id="33" name="q_entao (PCEntao)"><x>900.0</x><y>1220.0</y><final/></state>
+		<state id="34" name="q_f"><x>300.0</x><y>1290.0</y></state>
+		<state id="35" name="q_fi"><x>450.0</x><y>1290.0</y></state>
+		<state id="36" name="q_fim (PCFim)"><x>600.0</x><y>1290.0</y><final/></state>
+		<state id="37" name="q_i"><x>300.0</x><y>1360.0</y></state>
+		<state id="38" name="q_im"><x>450.0</x><y>1360.0</y></state>
+		<state id="39" name="q_imp"><x>600.0</x><y>1360.0</y></state>
+		<state id="40" name="q_impr"><x>750.0</x><y>1360.0</y></state>
+		<state id="41" name="q_impri"><x>900.0</x><y>1360.0</y></state>
+		<state id="42" name="q_imprim"><x>1050.0</x><y>1360.0</y></state>
+		<state id="43" name="q_imprimi"><x>1200.0</x><y>1360.0</y></state>
+		<state id="44" name="q_imprimir (PCImprimir)"><x>1350.0</x><y>1360.0</y><final/></state>
+		<state id="45" name="q_in"><x>450.0</x><y>1430.0</y></state>
+		<state id="46" name="q_ini (PCIni)"><x>600.0</x><y>1430.0</y><final/></state>
+		<state id="47" name="q_int_kw (PCInt)"><x>600.0</x><y>1470.0</y><final/></state>
+		<state id="48" name="q_l"><x>300.0</x><y>1540.0</y></state>
+		<state id="49" name="q_le"><x>450.0</x><y>1540.0</y></state>
+		<state id="50" name="q_ler (PCLer)"><x>600.0</x><y>1540.0</y><final/></state>
+		<state id="51" name="q_o"><x>300.0</x><y>1610.0</y></state>
+		<state id="52" name="q_ou (OpBoolOu)"><x>450.0</x><y>1610.0</y><final/></state>
+		<state id="53" name="q_p"><x>300.0</x><y>1680.0</y></state>
+		<state id="54" name="q_pr"><x>450.0</x><y>1680.0</y></state>
+		<state id="55" name="q_pro"><x>600.0</x><y>1680.0</y></state>
+		<state id="56" name="q_prog (PCProg)"><x>750.0</x><y>1680.0</y><final/></state>
+		<state id="57" name="q_r"><x>300.0</x><y>1750.0</y></state>
+		<state id="58" name="q_re"><x>450.0</x><y>1750.0</y></state>
+		<state id="59" name="q_rea"><x>600.0</x><y>1750.0</y></state>
+		<state id="60" name="q_real_kw (PCReal)"><x>750.0</x><y>1750.0</y><final/></state>
+		<state id="61" name="q_s"><x>300.0</x><y>1820.0</y></state>
+		<state id="62" name="q_se (PCSe)"><x>450.0</x><y>1820.0</y><final/></state>
+		<state id="63" name="q_sen"><x>600.0</x><y>1820.0</y></state>
+		<state id="64" name="q_sena"><x>750.0</x><y>1820.0</y></state>
+		<state id="65" name="q_senao (PCSenao)"><x>900.0</x><y>1820.0</y><final/></state>
+		<transition><from>0</from><to>1</to><read>:</read></transition>
+		<transition><from>1</from><to>2</to><read>=</read></transition>
+		<transition><from>0</from><to>3</to><read>&lt;</read></transition>
+		<transition><from>3</from><to>4</to><read>=</read></transition>
+		<transition><from>0</from><to>5</to><read>&gt;</read></transition>
+		<transition><from>5</from><to>6</to><read>=</read></transition>
+		<transition><from>0</from><to>7</to><read>=</read></transition>
+		<transition><from>7</from><to>8</to><read>=</read></transition>
+		<transition><from>0</from><to>9</to><read>!</read></transition>
+		<transition><from>9</from><to>10</to><read>=</read></transition>
+		<transition><from>0</from><to>11</to><read>*</read></transition>
+		<transition><from>0</from><to>12</to><read>/</read></transition>
+		<transition><from>0</from><to>13</to><read>+</read></transition>
+		<transition><from>0</from><to>14</to><read>-</read></transition>
+		<transition><from>0</from><to>15</to><read>(</read></transition>
+		<transition><from>0</from><to>16</to><read>)</read></transition>
+		<transition><from>0</from><to>17</to><read>[0-9]</read></transition>
+		<transition><from>17</from><to>17</to><read>[0-9]</read></transition>
+		<transition><from>17</from><to>18</to><read>.</read></transition>
+		<transition><from>18</from><to>19</to><read>[0-9]</read></transition>
+		<transition><from>19</from><to>19</to><read>[0-9]</read></transition>
+		<transition><from>0</from><to>20</to><read>"</read></transition>
+		<transition><from>20</from><to>20</to><read>[^"]</read></transition>
+		<transition><from>20</from><to>21</to><read>"</read></transition>
+		<transition><from>0</from><to>22</to><read>[a-z]</read></transition>
+		<transition><from>22</from><to>22</to><read>[a-zA-Z0-9]</read></transition>
+		<transition><from>0</from><to>23</to><read>D</read></transition>
+		<transition><from>23</from><to>24</to><read>E</read></transition>
+		<transition><from>24</from><to>25</to><read>C</read></transition>
+		<transition><from>0</from><to>26</to><read>E</read></transition>
+		<transition><from>26</from><to>27</to><read>N</read></transition>
+		<transition><from>27</from><to>28</to><read>Q</read></transition>
+		<transition><from>28</from><to>29</to><read>T</read></transition>
+		<transition><from>29</from><to>30</to><read>O</read></transition>
+		<transition><from>27</from><to>31</to><read>T</read></transition>
+		<transition><from>31</from><to>32</to><read>A</read></transition>
+		<transition><from>32</from><to>33</to><read>O</read></transition>
+		<transition><from>0</from><to>34</to><read>F</read></transition>
+		<transition><from>34</from><to>35</to><read>I</read></transition>
+		<transition><from>35</from><to>36</to><read>M</read></transition>
+		<transition><from>0</from><to>37</to><read>I</read></transition>
+		<transition><from>37</from><to>38</to><read>M</read></transition>
+		<transition><from>38</from><to>39</to><read>P</read></transition>
+		<transition><from>39</from><to>40</to><read>R</read></transition>
+		<transition><from>40</from><to>41</to><read>I</read></transition>
+		<transition><from>41</from><to>42</to><read>M</read></transition>
+		<transition><from>42</from><to>43</to><read>I</read></transition>
+		<transition><from>43</from><to>44</to><read>R</read></transition>
+		<transition><from>37</from><to>45</to><read>N</read></transition>
+		<transition><from>45</from><to>46</to><read>I</read></transition>
+		<transition><from>45</from><to>47</to><read>T</read></transition>
+		<transition><from>0</from><to>48</to><read>L</read></transition>
+		<transition><from>48</from><to>49</to><read>E</read></transition>
+		<transition><from>49</from><to>50</to><read>R</read></transition>
+		<transition><from>0</from><to>51</to><read>O</read></transition>
+		<transition><from>51</from><to>52</to><read>U</read></transition>
+		<transition><from>0</from><to>53</to><read>P</read></transition>
+		<transition><from>53</from><to>54</to><read>R</read></transition>
+		<transition><from>54</from><to>55</to><read>O</read></transition>
+		<transition><from>55</from><to>56</to><read>G</read></transition>
+		<transition><from>0</from><to>57</to><read>R</read></transition>
+		<transition><from>57</from><to>58</to><read>E</read></transition>
+		<transition><from>58</from><to>59</to><read>A</read></transition>
+		<transition><from>59</from><to>60</to><read>L</read></transition>
+		<transition><from>0</from><to>61</to><read>S</read></transition>
+		<transition><from>61</from><to>62</to><read>E</read></transition>
+		<transition><from>62</from><to>63</to><read>N</read></transition>
+		<transition><from>63</from><to>64</to><read>A</read></transition>
+		<transition><from>64</from><to>65</to><read>O</read></transition>
+	</automaton>
 </structure>
