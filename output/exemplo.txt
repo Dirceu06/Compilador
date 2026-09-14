@@ -1,0 +1,12 @@
+:DEC
+fator : INT
+calculo : REAL
+:PROG
+fator := 12
+calculo := 45.75
+S fator <= 20 E calculo != 0.0 ENTAO
+    IMPRIMIR "Resultado OK"
+SENAO
+    IMPRIMIR "Erro
+FIM
+

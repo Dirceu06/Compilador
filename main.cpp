@@ -1,9 +1,16 @@
+/**
+ * @file main.cpp
+ * 
+ * @brief Entrega Parcial AP1
+ * 
+ * Dirceu Morais da Costa Júnior (2669455)
+ * Lucas Henrique Motta			 (2669730)
+ */
+
 #include <iostream>
 #include "Lexico.h"
 
-
 using namespace std;
-
 
 int main(int argc, char* argv[]){
 	Lexico lex(argv[1]);
@@ -19,8 +26,3 @@ int main(int argc, char* argv[]){
 
 	return 0;
 }
-
-
-
-
-

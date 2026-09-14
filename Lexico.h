@@ -15,7 +15,7 @@ private:
     LeitorArquivo *arq;
     int *id;
 
-    // Tabela de palavras-chave da linguagem GYH
+    // tabela de palavras-chave da linguagem GYH
     map<string, string> palavrasChave = {
         {"DEC",      "PCDec"},
         {"PROG",     "PCProg"},
@@ -53,56 +53,55 @@ public:
         while ((c = arq->lerProxCaracter()) != -1) {
             ch = (char)c;
 
-            // Estado 1: estado inicial
+            // estado 1 inicial
             if (estado == 1) {
 
-                // Ignora espaços em branco
+                // ignora espaço em branco
                 if (isspace(ch)) {
                     continue;
                 }
 
-                // Ignora comentários iniciados por '#'
+                // ignora comentarios (inicia c/ #)
                 if (ch == '#') {
-                    // Consome até o fim da linha
+                    // vai até fim da linha
                     while ((c = arq->lerProxCaracter()) != -1) {
                         if ((char)c == '\n') break;
                     }
                     continue;
                 }
 
-                // Operadores aritméticos simples
+                // op aritmeticos
                 if (ch == '+') { (*id)++; return new Token("+", "OpAritSoma", id); }
                 if (ch == '-') { (*id)++; return new Token("-", "OpAritSub", id);  }
                 if (ch == '*') { (*id)++; return new Token("*", "OpAritMult", id); }
                 if (ch == '/') { (*id)++; return new Token("/", "OpAritDiv", id);  }
 
-                // Parênteses
                 if (ch == '(') { (*id)++; return new Token("(", "AbrePar", id);   }
                 if (ch == ')') { (*id)++; return new Token(")", "FechaPar", id);   }
 
-                // '<' -> pode ser '<' ou '<='
+                // < ou <=
                 if (ch == '<') { estado = 2; continue; }
 
-                // '>' -> pode ser '>' ou '>='
+                // > ou >=
                 if (ch == '>') { estado = 7; continue; }
 
-                // '=' -> pode ser '=' isolado (erro) ou parte de '=='
+                // = isolado (erro) ou parte de ==
                 if (ch == '=') { estado = 5; continue; }
 
-                // '!' -> deve ser seguido de '=' para formar '!='
+                // ! deve ser seguido de =
                 if (ch == '!') { estado = 10; continue; }
 
-                // ':' -> pode ser ':' (Delim) ou ':=' (Atrib)
+                // : (delim) ou := (atrib)
                 if (ch == ':') { estado = 12; continue; }
 
-                // Cadeia de caracteres: sequência entre aspas duplas
+                // cadeia de caracteres entre aspas duplas
                 if (ch == '"') {
                     lexema = "";
                     estado = 20;
                     continue;
                 }
 
-                // Número: sequência de dígitos
+                // Numero: sequencia de dígitos
                 if (isdigit(ch)) {
                     lexema = "";
                     lexema += ch;
@@ -110,9 +109,9 @@ public:
                     continue;
                 }
 
-                // Identificador ou palavra-chave:
-                // - Variável: começa com letra minúscula
-                // - Palavra-chave: começa com letra maiúscula
+                // identificador ou palavra-chave
+                // - variavel: começa com letra minúscula
+                // - palavra-chave: começa com letra maiúscula
                 if (isalpha(ch)) {
                     lexema = "";
                     lexema += ch;
@@ -120,21 +119,19 @@ public:
                     continue;
                 }
 
-                // Caractere desconhecido -> Erro Léxico
+                // caractere desconhecido
                 cerr << "Erro Lexico: caractere desconhecido '" << ch << "'" << endl;
                 continue;
             }
 
-            // -------------------------------------------------------
-            // Estado 2: leu '<'
-            // -------------------------------------------------------
+            // estado 2: <
             if (estado == 2) {
                 if (ch == '=') {
                     (*id)++;
                     estado = 1;
                     return new Token("<=", "OpRelMenorIgual", id);
                 } else {
-                    // Devolve o caractere lido (não faz parte de '<=')
+                    // devolve o caractere lido (não faz parte de <=)
                     arq->devolverCaracter();
                     (*id)++;
                     estado = 1;
@@ -142,9 +139,7 @@ public:
                 }
             }
 
-            // -------------------------------------------------------
-            // Estado 5: leu '=' (pode ser '==' ou erro léxico)
-            // -------------------------------------------------------
+            // estado 5: leu = (pode ser == ou erro léxico)
             if (estado == 5) {
                 if (ch == '=') {
                     (*id)++;
@@ -158,9 +153,7 @@ public:
                 }
             }
 
-            // -------------------------------------------------------
-            // Estado 7: leu '>'
-            // -------------------------------------------------------
+            // estado 7: leu >
             if (estado == 7) {
                 if (ch == '=') {
                     (*id)++;
@@ -174,9 +167,7 @@ public:
                 }
             }
 
-            // -------------------------------------------------------
-            // Estado 10: leu '!'
-            // -------------------------------------------------------
+            // estado 10: leu !
             if (estado == 10) {
                 if (ch == '=') {
                     (*id)++;
@@ -190,9 +181,7 @@ public:
                 }
             }
 
-            // -------------------------------------------------------
-            // Estado 12: leu ':'
-            // -------------------------------------------------------
+            // estado 12: leu :
             if (estado == 12) {
                 if (ch == '=') {
                     (*id)++;
@@ -206,9 +195,7 @@ public:
                 }
             }
 
-            // -------------------------------------------------------
-            // Estado 20: dentro de uma cadeia de caracteres (string)
-            // -------------------------------------------------------
+            // estado 20: dentro de uma cadeia de caracteres (string)
             if (estado == 20) {
                 if (ch == '"') {
                     (*id)++;
@@ -224,9 +211,7 @@ public:
                 }
             }
 
-            // -------------------------------------------------------
-            // Estado 30: lendo número (inteiro ou real)
-            // -------------------------------------------------------
+            // estado 30: lendo número (inteiro ou real)
             if (estado == 30) {
                 if (isdigit(ch)) {
                     lexema += ch;
@@ -243,9 +228,7 @@ public:
                 }
             }
 
-            // -------------------------------------------------------
-            // Estado 31: após o ponto decimal do número real
-            // -------------------------------------------------------
+            // estado 31: após o ponto decimal do número real
             if (estado == 31) {
                 if (isdigit(ch)) {
                     lexema += ch;
@@ -258,9 +241,7 @@ public:
                 }
             }
 
-            // -------------------------------------------------------
-            // Estado 40: lendo identificador ou palavra-chave
-            // -------------------------------------------------------
+            // estado 40: lendo identificador ou palavra chave
             if (estado == 40) {
                 if (isalpha(ch) || isdigit(ch) || ch == '_') {
                     lexema += ch;
@@ -270,26 +251,26 @@ public:
                     (*id)++;
                     estado = 1;
 
-                    // Verifica se é palavra-chave (maiúsculas) ou variável (minúscula inicial)
+                    // olha se é palavra-chave (maiuscula) ou variavel (minuscula)
                     auto it = palavrasChave.find(lexema);
                     if (it != palavrasChave.end()) {
                         return new Token(lexema, it->second, id);
                     }
 
-                    // Variável: deve começar com letra minúscula
+                    // variavel
                     if (islower(lexema[0])) {
                         return new Token(lexema, "Var", id);
                     }
 
-                    // Começa com maiúscula mas não é palavra-chave -> Erro Léxico
+                    // começa com maiuscula mas nao é palavra chave
                     cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
                     continue;
                 }
             }
 
-        } // fim do while
+        }
 
-        // Trata tokens pendentes ao atingir fim de arquivo
+        // trata tokens pendentes ao atingir fim do arquivo
         if (estado == 2) {
             (*id)++;
             return new Token("<", "OpRelMenor", id);

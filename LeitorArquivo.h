@@ -39,12 +39,6 @@ public:
 
         return caractere;
     }
-
-    /* Esta rotina devolve o ultimo caractere lido para o buffer do arquivo. Desta maneira é possível
-       reler o mesmo caractere na proxima chamada de lerProxCaracter().
-       Necessario para reconhecer lexemas com mais de um caractere
-       (identificadores, numeros), pois precisamos "espiar" o caractere
-       seguinte para saber onde o lexema termina. */
        
     void devolverCaracter() {
         if (file.is_open()) {
