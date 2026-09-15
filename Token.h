@@ -12,8 +12,8 @@ public:
     string tipo;
     int id;
 
-    Token(string lexema, string tipo, int *id)
-        : lexema(lexema), tipo(tipo), id(*id) {}
+    Token(string lexema, string tipo)
+        : lexema(lexema), tipo(tipo) {}
 
     string getLexema() { return lexema; }
     void setLexema(string l) { lexema = l; }
@@ -25,7 +25,7 @@ public:
     void setId(int *i) { id = *i; }
 
     string toString() {
-        return "<" + tipo + ", " + lexema + ", " + to_string(id) + ">";
+        return "<" + tipo + ", " + lexema + ">";
     }
 };
 

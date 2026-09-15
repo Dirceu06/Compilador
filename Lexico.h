@@ -71,13 +71,13 @@ public:
                 }
 
                 // op aritmeticos
-                if (ch == '+') { (*id)++; return new Token("+", "OpAritSoma", id); }
-                if (ch == '-') { (*id)++; return new Token("-", "OpAritSub", id);  }
-                if (ch == '*') { (*id)++; return new Token("*", "OpAritMult", id); }
-                if (ch == '/') { (*id)++; return new Token("/", "OpAritDiv", id);  }
+                if (ch == '+') { (*id)++; return new Token("+", "OpAritSoma"); }
+                if (ch == '-') { (*id)++; return new Token("-", "OpAritSub");  }
+                if (ch == '*') { (*id)++; return new Token("*", "OpAritMult"); }
+                if (ch == '/') { (*id)++; return new Token("/", "OpAritDiv");  }
 
-                if (ch == '(') { (*id)++; return new Token("(", "AbrePar", id);   }
-                if (ch == ')') { (*id)++; return new Token(")", "FechaPar", id);   }
+                if (ch == '(') { (*id)++; return new Token("(", "AbrePar");   }
+                if (ch == ')') { (*id)++; return new Token(")", "FechaPar");   }
 
                 // < ou <=
                 if (ch == '<') { estado = 2; continue; }
@@ -129,13 +129,13 @@ public:
                 if (ch == '=') {
                     (*id)++;
                     estado = 1;
-                    return new Token("<=", "OpRelMenorIgual", id);
+                    return new Token("<=", "OpRelMenorIgual");
                 } else {
                     // devolve o caractere lido (não faz parte de <=)
                     arq->devolverCaracter();
                     (*id)++;
                     estado = 1;
-                    return new Token("<", "OpRelMenor", id);
+                    return new Token("<", "OpRelMenor");
                 }
             }
 
@@ -144,7 +144,7 @@ public:
                 if (ch == '=') {
                     (*id)++;
                     estado = 1;
-                    return new Token("==", "OpRelIgual", id);
+                    return new Token("==", "OpRelIgual");
                 } else {
                     arq->devolverCaracter();
                     estado = 1;
@@ -158,12 +158,12 @@ public:
                 if (ch == '=') {
                     (*id)++;
                     estado = 1;
-                    return new Token(">=", "OpRelMaiorIgual", id);
+                    return new Token(">=", "OpRelMaiorIgual");
                 } else {
                     arq->devolverCaracter();
                     (*id)++;
                     estado = 1;
-                    return new Token(">", "OpRelMaior", id);
+                    return new Token(">", "OpRelMaior");
                 }
             }
 
@@ -172,7 +172,7 @@ public:
                 if (ch == '=') {
                     (*id)++;
                     estado = 1;
-                    return new Token("!=", "OpRelDif", id);
+                    return new Token("!=", "OpRelDif");
                 } else {
                     arq->devolverCaracter();
                     estado = 1;
@@ -186,12 +186,12 @@ public:
                 if (ch == '=') {
                     (*id)++;
                     estado = 1;
-                    return new Token(":=", "Atrib", id);
+                    return new Token(":=", "Atrib");
                 } else {
                     arq->devolverCaracter();
                     (*id)++;
                     estado = 1;
-                    return new Token(":", "Delim", id);
+                    return new Token(":", "Delim");
                 }
             }
 
@@ -200,7 +200,7 @@ public:
                 if (ch == '"') {
                     (*id)++;
                     estado = 1;
-                    return new Token(lexema, "Cadeia", id);
+                    return new Token(lexema, "Cadeia");
                 } else if (ch == '\n' || c == -1) {
                     estado = 1;
                     cerr << "Erro Lexico: cadeia de caracteres nao fechada" << endl;
@@ -224,7 +224,7 @@ public:
                     arq->devolverCaracter();
                     (*id)++;
                     estado = 1;
-                    return new Token(lexema, "NumInt", id);
+                    return new Token(lexema, "NumInt");
                 }
             }
 
@@ -237,7 +237,7 @@ public:
                     arq->devolverCaracter();
                     (*id)++;
                     estado = 1;
-                    return new Token(lexema, "NumReal", id);
+                    return new Token(lexema, "NumReal");
                 }
             }
 
@@ -254,12 +254,12 @@ public:
                     // olha se é palavra-chave (maiuscula) ou variavel (minuscula)
                     auto it = palavrasChave.find(lexema);
                     if (it != palavrasChave.end()) {
-                        return new Token(lexema, it->second, id);
+                        return new Token(lexema, it->second);
                     }
 
                     // variavel
                     if (islower(lexema[0])) {
-                        return new Token(lexema, "Var", id);
+                        return new Token(lexema, "Var");
                     }
 
                     // começa com maiuscula mas nao é palavra chave
@@ -273,32 +273,32 @@ public:
         // trata tokens pendentes ao atingir fim do arquivo
         if (estado == 2) {
             (*id)++;
-            return new Token("<", "OpRelMenor", id);
+            return new Token("<", "OpRelMenor");
         }
         if (estado == 7) {
             (*id)++;
-            return new Token(">", "OpRelMaior", id);
+            return new Token(">", "OpRelMaior");
         }
         if (estado == 12) {
             (*id)++;
-            return new Token(":", "Delim", id);
+            return new Token(":", "Delim");
         }
         if (estado == 30) {
             (*id)++;
-            return new Token(lexema, "NumInt", id);
+            return new Token(lexema, "NumInt");
         }
         if (estado == 31) {
             (*id)++;
-            return new Token(lexema, "NumReal", id);
+            return new Token(lexema, "NumReal");
         }
         if (estado == 40) {
             (*id)++;
             auto it = palavrasChave.find(lexema);
             if (it != palavrasChave.end()) {
-                return new Token(lexema, it->second, id);
+                return new Token(lexema, it->second);
             }
             if (islower(lexema[0])) {
-                return new Token(lexema, "Var", id);
+                return new Token(lexema, "Var");
             }
             cerr << "Erro Lexico: identificador invalido \"" << lexema << "\"" << endl;
         }
