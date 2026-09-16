@@ -242,7 +242,7 @@ public:
                 // maiuscula: dispatch + consome ch (2a letra) aqui mesmo
                 switch (first) {
 
-                    // D → E → C  (DEC)
+                    // D => E => C  (DEC)
                     case 'D':
                         if (ch == 'E') { lexema += ch; estado = 42; }
                         else {
@@ -252,7 +252,7 @@ public:
                         }
                         break;
 
-                    // P → R → O → G  (PROG)
+                    // P => R => O => G  (PROG)
                     case 'P':
                         if (ch == 'R') { lexema += ch; estado = 44; }
                         else {
@@ -262,9 +262,9 @@ public:
                         }
                         break;
 
-                    // I → N → T  (INT)
-                    // I → N → I  (INI)
-                    // I → M → P → R → I → M → I → R  (IMPRIMIR)
+                    // I => N => T  (INT)
+                    // I => N => I  (INI)
+                    // I => M => P => R => I => M => I => R  (IMPRIMIR)
                     case 'I':
                         if (ch == 'N') { lexema += ch; estado = 47; }
                         else if (ch == 'M') { lexema += ch; estado = 48; }
@@ -275,7 +275,7 @@ public:
                         }
                         break;
 
-                    // R → E → A → L  (REAL)
+                    // R => E => A => L  (REAL)
                     case 'R':
                         if (ch == 'E') { lexema += ch; estado = 55; }
                         else {
@@ -285,7 +285,7 @@ public:
                         }
                         break;
 
-                    // L → E → R  (LER)
+                    // L => E => R  (LER)
                     case 'L':
                         if (ch == 'E') { lexema += ch; estado = 58; }
                         else {
@@ -295,8 +295,8 @@ public:
                         }
                         break;
 
-                    // S → E         (SE)
-                    // S → E → N → A → O  (SENAO)
+                    // S => E         (SE)
+                    // S => E => N => A => O  (SENAO)
                     case 'S':
                         if (ch == 'E') { lexema += ch; estado = 72; }
                         else {
@@ -307,8 +307,8 @@ public:
                         break;
 
                     // E               (E  / OpBoolE)
-                    // E → N → T → A → O  (ENTAO)
-                    // E → N → Q → T → O  (ENQTO)
+                    // E => N => T => A => O  (ENTAO)
+                    // E => N => Q => T => O  (ENQTO)
                     case 'E':
                         if (ch == 'N') { lexema += ch; estado = 63; }
                         else if (!isalpha(ch) && !isdigit(ch) && ch != '_') {
@@ -324,7 +324,7 @@ public:
                         }
                         break;
 
-                    // F → I → M  (FIM)
+                    // F => I => M  (FIM)
                     case 'F':
                         if (ch == 'I') { lexema += ch; estado = 68; }
                         else {
@@ -334,7 +334,7 @@ public:
                         }
                         break;
 
-                    // O → U  (OU)
+                    // O => U  (OU)
                     case 'O':
                         if (ch == 'U') {
                             lexema += ch;
@@ -362,7 +362,7 @@ public:
                 continue;
             }
 
-            // D → [E ja consumido no dispatch] → C
+            // D => [E ja consumido no dispatch] => C
             // Estado 42: leu 'DE', espera 'C'
             if (estado == 42) {
                 if (ch == 'C') { lexema += ch; (*id)++; estado = 1; return new Token(lexema, "PCDec"); }
@@ -372,7 +372,7 @@ public:
                 continue;
             }
 
-            // P → [R ja consumido] → O → G
+            // P => [R ja consumido] => O => G
             // Estado 44: leu 'PR', espera 'O'
             if (estado == 44) {
                 if (ch == 'O') { lexema += ch; estado = 45; continue; }
@@ -391,7 +391,7 @@ public:
                 continue;
             }
 
-            // I → [N ja consumido] → T / I
+            // I => [N ja consumido] => T / I
             // Estado 47: leu 'IN', espera 'T' (INT) ou 'I' (INI)
             if (estado == 47) {
                 if (ch == 'T') { lexema += ch; (*id)++; estado = 1; return new Token(lexema, "PCInt"); }
@@ -402,7 +402,7 @@ public:
                 continue;
             }
 
-            // I → [M ja consumido] → P → R → I → M → I → R
+            // I => [M ja consumido] => P => R => I => M => I => R
             // Estado 48: leu 'IM', espera 'P'
             if (estado == 48) {
                 if (ch == 'P') { lexema += ch; estado = 49; continue; }
@@ -457,7 +457,7 @@ public:
                 continue;
             }
 
-            // R → [E ja consumido] → A → L
+            // R => [E ja consumido] => A => L
             // Estado 55: leu 'RE', espera 'A'
             if (estado == 55) {
                 if (ch == 'A') { lexema += ch; estado = 56; continue; }
@@ -476,7 +476,7 @@ public:
                 continue;
             }
 
-            // L → [E ja consumido] → R
+            // L => [E ja consumido] => R
             // Estado 58: leu 'LE', espera 'R'
             if (estado == 58) {
                 if (ch == 'R') { lexema += ch; (*id)++; estado = 1; return new Token(lexema, "PCLer"); }
@@ -486,7 +486,7 @@ public:
                 continue;
             }
 
-            // S → [E ja consumido] → aceita SE  ou  → N → A → O (SENAO)
+            // S => [E ja consumido] => aceita SE  ou  => N => A => O (SENAO)
             // Estado 72: leu 'SE'
             if (estado == 72) {
                 if (ch == 'N') { lexema += ch; estado = 60; continue; }
@@ -520,8 +520,8 @@ public:
                 continue;
             }
 
-            // E → [N ja consumido] → T → A → O  (ENTAO)
-            //                      → Q → T → O  (ENQTO)
+            // E => [N ja consumido] => T => A => O  (ENTAO)
+            //                      => Q => T => O  (ENQTO)
             // Estado 63: leu 'EN', espera 'T' ou 'Q'
             if (estado == 63) {
                 if (ch == 'T') { lexema += ch; estado = 64; continue; }
@@ -568,7 +568,7 @@ public:
                 continue;
             }
 
-            // F → [I ja consumido] → M
+            // F => [I ja consumido] => M
             // Estado 68: leu 'FI', espera 'M'
             if (estado == 68) {
                 if (ch == 'M') { lexema += ch; (*id)++; estado = 1; return new Token(lexema, "PCFim"); }
