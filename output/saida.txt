@@ -28,8 +28,7 @@
 <PCIni, INI>
 <Var, aux>
 <Atrib, :=>
-<NumReal, 2.>
-<NumInt, 4>
+<NumInt, 2>
 <OpAritSoma, +>
 <NumInt, 3>
 <OpAritSub, ->
@@ -41,7 +40,7 @@
 <OpAritMult, *>
 <NumInt, 5>
 <OpAritSub, ->
-<NumReal, 1.6>
+<NumInt, 1>
 <Var, num2>
 <Atrib, :=>
 <Var, num1>
@@ -65,6 +64,7 @@
 <Var, num2>
 <OpRelDif, !=>
 <Var, num4>
+<PCEntao, ENTAO>
 <PCIni, INI>
 <Var, aux>
 <Atrib, :=>
@@ -92,8 +92,6 @@
 <Atrib, :=>
 <Var, aux>
 <PCFim, FIM>
-<PCImprimir, IMPRIMIR>
-<Cadeia, Acabou o programa>
 <PCImprimir, IMPRIMIR>
 <Var, num1>
 <PCImprimir, IMPRIMIR>
