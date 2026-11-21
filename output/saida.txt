@@ -28,7 +28,8 @@
 <PCIni, INI>
 <Var, aux>
 <Atrib, :=>
-<NumInt, 2>
+<NumReal, 2.>
+<NumInt, 4>
 <OpAritSoma, +>
 <NumInt, 3>
 <OpAritSub, ->
@@ -40,7 +41,7 @@
 <OpAritMult, *>
 <NumInt, 5>
 <OpAritSub, ->
-<NumInt, 1>
+<NumReal, 1.6>
 <Var, num2>
 <Atrib, :=>
 <Var, num1>
@@ -98,3 +99,5 @@
 <Var, num2>
 <PCImprimir, IMPRIMIR>
 <Var, num3>
+<PCImprimir, IMPRIMIR>
+<Cadeia, Acabou o programa>

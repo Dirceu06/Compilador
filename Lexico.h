@@ -261,7 +261,7 @@ public:
                             lexema = "";
                         }
                         break;
-
+                    // !!!!!!!!!!!!!!!!!!!!!!! arrumar !!!!!!!!!!!!!!!!!!!!!!!!!!
                     // I => N => T  (INT)
                     // I => N => I  (INI)
                     // I => M => P => R => I => M => I => R  (IMPRIMIR)
