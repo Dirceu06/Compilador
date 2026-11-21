@@ -10,6 +10,10 @@ using namespace std;
 class LeitorArquivo {
 private:
     ifstream file;
+    int linha = 1;
+    int coluna = 1;
+    int linhaAnterior = 1;
+    int colunaAnterior = 1;
 
 public:
     LeitorArquivo(string arquivo) {
@@ -19,31 +23,30 @@ public:
         }
     }
 
-    ~LeitorArquivo() {
-        if (file.is_open()) {
-            file.close();
-        }
-    }
+    bool aberto() const { return file.is_open(); }
+    int numeroLinha() const { return linha; }
+    int numeroColuna() const { return coluna; }
 
     int lerProxCaracter() {
-        int caractere = -1;
-
-        if (file.is_open()) {
-            char c;
-            if (file.get(c)) {
-                caractere = c;                 
-            } else {
-                caractere = -1;
-            }
+        const int caractere = file.get();
+        linhaAnterior = linha;
+        colunaAnterior = coluna;
+        if (caractere == '\n') {
+            ++linha;
+            coluna = 1;
+        } else if (caractere != -1) {
+            ++coluna;
         }
-
         return caractere;
     }
-       
+
+    int espiarProxCaracter() { return file.peek(); }
+
     void devolverCaracter() {
-        if (file.is_open()) {
-            file.unget();
+        if (file.unget()) {
+            linha = linhaAnterior;
+            coluna = colunaAnterior;
         }
-    } 
+    }
 };
 #endif

@@ -1,32 +1,31 @@
 /**
  * @file main.cpp
  * 
- * @brief Entrega Parcial AP1
+ * @brief Entrega Parcial AP2 - Analisador Sintático
  * 
  * Dirceu Morais da Costa Júnior (2669455)
  * Lucas Henrique Motta			 (2669730)
  */
 
 #include <iostream>
-#include "Lexico.h"
+#include "Sintatico.h"
 
-using namespace std;
+int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        std::cerr << "Uso: " << argv[0] << " <arquivo.gyh>\n";
+        return 2;
+    }
 
-int main(int argc, char* argv[]){
-	Lexico lex(argv[1]);
-	
-	Token* t = lex.proximoToken();
-	// imprime no terminal e grava no arquivo saida.txt
-	ofstream saida("saida.txt");
-	while(t != nullptr){
-		saida << t->toString() << endl;
-		cout << t->toString() << endl;
-		delete t;
-		t = lex.proximoToken();
-	}
+    Lexico lexico(argv[1]);
+    if (!lexico.arquivoAberto()) {
+        return 2;
+    }
 
-	saida.close();
-	cout << "\n\n abrir arquivo Fonte\n\n" << endl;
+    Sintatico sintatico(lexico);
+    if (!sintatico.analisar()) {
+        return 1;
+    }
 
-	return 0;
+    std::cout << "Programa sintaticamente válido.\n";
+    return 0;
 }

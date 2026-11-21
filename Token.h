@@ -10,10 +10,13 @@ class Token {
 public:
     string lexema;
     string tipo;
-    int id;
+    string erro;
+    int id = 0;
+    int linha;
+    int coluna;
 
-    Token(string lexema, string tipo)
-        : lexema(lexema), tipo(tipo) {}
+    Token(string lexema, string tipo, int linha = 1, int coluna = 1)
+        : lexema(lexema), tipo(tipo), linha(linha), coluna(coluna) {}
 
     string getLexema() { return lexema; }
     void setLexema(string l) { lexema = l; }

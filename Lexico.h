@@ -2,7 +2,6 @@
 #define LEXICO_H
 
 #include <string>
-#include <memory>
 #include <cctype>
 #include "LeitorArquivo.h"
 #include "Token.h"
@@ -11,32 +10,64 @@ using namespace std;
 
 class Lexico {
 private:
-    LeitorArquivo *arq;
-    int *id;
+    LeitorArquivo arq;
 
+    static bool caractereDePalavra(int c) {
+        return isalnum(c) || c == '_';
+    }
 
 public:
-    Lexico(string arquivo) {
-        id = new int(0);
-        arq = new LeitorArquivo(arquivo);
-    }
+    explicit Lexico(const string& arquivo) : arq(arquivo) {}
 
-    ~Lexico() {
-        delete id;
-        delete arq;
-    }
+    bool arquivoAberto() const { return arq.aberto(); }
+    int numeroLinha() const { return arq.numeroLinha(); }
+    int numeroColuna() const { return arq.numeroColuna(); }
 
     Token* proximoToken() {
-        int c;
-        char ch;
         int estado = 1;
-        string lexema = "";
+        string lexema;
+        int linha = arq.numeroLinha();
+        int coluna = arq.numeroColuna();
 
-        while ((c = arq->lerProxCaracter()) != -1) {
-            ch = (char)c;
+        auto erro = [&](const string& trecho, const string& mensagem) {
+            Token* token = new Token(trecho, "ErroLexico", linha, coluna);
+            token->erro = mensagem;
+            return token;
+        };
+
+        auto palavraInvalida = [&]() {
+            while (caractereDePalavra(arq.espiarProxCaracter())) {
+                lexema += static_cast<char>(arq.lerProxCaracter());
+            }
+            return erro(lexema, "palavra ou identificador invalido '" + lexema + "'");
+        };
+
+        auto emitir = [&](const string& texto, const string& tipo) {
+            const bool palavraReservada = tipo.compare(0, 2, "PC") == 0
+                || tipo == "OpBoolE" || tipo == "OpBoolOu";
+            if (palavraReservada && caractereDePalavra(arq.espiarProxCaracter())) {
+                return palavraInvalida();
+            }
+            if (tipo == "PCReal") {
+                return erro(texto, "palavra-chave 'REAL' fora da tabela de tokens da AP2");
+            }
+            if (tipo == "NumReal") {
+                return erro(texto, "número '" + texto + "' invalido; a AP2 usa números inteiros");
+            }
+            if (tipo == "Var" && texto.find('_') != string::npos) {
+                return palavraInvalida();
+            }
+            return new Token(texto, tipo, linha, coluna);
+        };
+
+        int c;
+        while ((c = arq.lerProxCaracter()) != -1) {
+            const auto ch = static_cast<unsigned char>(c);
 
             // estado 1 inicial
             if (estado == 1) {
+                linha = arq.numeroLinha();
+                coluna = arq.numeroColuna() - 1;
 
                 // ignora espaço em branco
                 if (isspace(ch)) {
@@ -45,20 +76,20 @@ public:
 
                 // ignora comentarios (inicia c/ #)
                 if (ch == '#') {
-                    while ((c = arq->lerProxCaracter()) != -1) {
+                    while ((c = arq.lerProxCaracter()) != -1) {
                         if ((char)c == '\n') break;
                     }
                     continue;
                 }
 
                 // op aritmeticos
-                if (ch == '+') { (*id)++; return new Token("+", "OpAritSoma"); }
-                if (ch == '-') { (*id)++; return new Token("-", "OpAritSub");  }
-                if (ch == '*') { (*id)++; return new Token("*", "OpAritMult"); }
-                if (ch == '/') { (*id)++; return new Token("/", "OpAritDiv");  }
+                if (ch == '+') { return emitir("+", "OpAritSoma"); }
+                if (ch == '-') { return emitir("-", "OpAritSub");  }
+                if (ch == '*') { return emitir("*", "OpAritMult"); }
+                if (ch == '/') { return emitir("/", "OpAritDiv");  }
 
-                if (ch == '(') { (*id)++; return new Token("(", "AbrePar");   }
-                if (ch == ')') { (*id)++; return new Token(")", "FechaPar");   }
+                if (ch == '(') { return emitir("(", "AbrePar");   }
+                if (ch == ')') { return emitir(")", "FechaPar");   }
 
                 // < ou <=
                 if (ch == '<') { estado = 2; continue; }
@@ -99,90 +130,65 @@ public:
                 }
 
                 // caractere desconhecido
-                cerr << "Erro Lexico: caractere desconhecido '" << ch << "'" << endl;
-                continue;
+                return erro(string(1, ch), "caractere desconhecido '" + string(1, ch) + "'");
             }
 
             // estado 2: leu <
             if (estado == 2) {
                 if (ch == '=') {
-                    (*id)++;
-                    estado = 1;
-                    return new Token("<=", "OpRelMenorIgual");
+                    return emitir("<=", "OpRelMenorIgual");
                 } else {
-                    arq->devolverCaracter();
-                    (*id)++;
-                    estado = 1;
-                    return new Token("<", "OpRelMenor");
+                    arq.devolverCaracter();
+                    return emitir("<", "OpRelMenor");
                 }
             }
 
             // estado 5: leu =
             if (estado == 5) {
                 if (ch == '=') {
-                    (*id)++;
-                    estado = 1;
-                    return new Token("==", "OpRelIgual");
+                    return emitir("==", "OpRelIgual");
                 } else {
-                    arq->devolverCaracter();
-                    estado = 1;
-                    cerr << "Erro Lexico: '=' isolado nao e um token valido" << endl;
-                    continue;
+                    arq.devolverCaracter();
+                    return erro("=", "'=' isolado nao e um token valido");
                 }
             }
 
             // estado 7: leu >
             if (estado == 7) {
                 if (ch == '=') {
-                    (*id)++;
-                    estado = 1;
-                    return new Token(">=", "OpRelMaiorIgual");
+                    return emitir(">=", "OpRelMaiorIgual");
                 } else {
-                    arq->devolverCaracter();
-                    (*id)++;
-                    estado = 1;
-                    return new Token(">", "OpRelMaior");
+                    arq.devolverCaracter();
+                    return emitir(">", "OpRelMaior");
                 }
             }
 
             // estado 10: leu !
             if (estado == 10) {
                 if (ch == '=') {
-                    (*id)++;
-                    estado = 1;
-                    return new Token("!=", "OpRelDif");
+                    return emitir("!=", "OpRelDif");
                 } else {
-                    arq->devolverCaracter();
-                    estado = 1;
-                    cerr << "Erro Lexico: '!' isolado nao e um token valido" << endl;
-                    continue;
+                    arq.devolverCaracter();
+                    return erro("!", "'!' isolado nao e um token valido");
                 }
             }
 
             // estado 12: leu :
             if (estado == 12) {
                 if (ch == '=') {
-                    (*id)++;
-                    estado = 1;
-                    return new Token(":=", "Atrib");
+                    return emitir(":=", "Atrib");
                 } else {
-                    arq->devolverCaracter();
-                    (*id)++;
-                    estado = 1;
-                    return new Token(":", "Delim");
+                    arq.devolverCaracter();
+                    return emitir(":", "Delim");
                 }
             }
 
             // estado 20: dentro de uma cadeia de caracteres
             if (estado == 20) {
                 if (ch == '"') {
-                    (*id)++;
-                    estado = 1;
-                    return new Token(lexema, "Cadeia");
-                } else if (ch == '\n' || c == -1) {
-                    estado = 1;
-                    cerr << "Erro Lexico: cadeia de caracteres nao fechada" << endl;
-                    continue;
+                    return emitir(lexema, "Cadeia");
+                } else if (ch == '\n') {
+                    return erro("\"" + lexema, "cadeia de caracteres nao fechada");
                 } else {
                     lexema += ch;
                     continue;
@@ -199,10 +205,8 @@ public:
                     estado = 31;
                     continue;
                 } else {
-                    arq->devolverCaracter();
-                    (*id)++;
-                    estado = 1;
-                    return new Token(lexema, "NumInt");
+                    arq.devolverCaracter();
+                    return emitir(lexema, "NumInt");
                 }
             }
 
@@ -212,10 +216,8 @@ public:
                     lexema += ch;
                     continue;
                 } else {
-                    arq->devolverCaracter();
-                    (*id)++;
-                    estado = 1;
-                    return new Token(lexema, "NumReal");
+                    arq.devolverCaracter();
+                    return emitir(lexema, "NumReal");
                 }
             }
 
@@ -232,10 +234,8 @@ public:
                         lexema += ch;
                         continue;
                     } else {
-                        arq->devolverCaracter();
-                        (*id)++;
-                        estado = 1;
-                        return new Token(lexema, "Var");
+                        arq.devolverCaracter();
+                        return emitir(lexema, "Var");
                     }
                 }
 
@@ -246,9 +246,8 @@ public:
                     case 'D':
                         if (ch == 'E') { lexema += ch; estado = 42; }
                         else {
-                            arq->devolverCaracter(); estado = 1;
-                            cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                            lexema = "";
+                            arq.devolverCaracter();
+                            return palavraInvalida();
                         }
                         break;
 
@@ -256,9 +255,8 @@ public:
                     case 'P':
                         if (ch == 'R') { lexema += ch; estado = 44; }
                         else {
-                            arq->devolverCaracter(); estado = 1;
-                            cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                            lexema = "";
+                            arq.devolverCaracter();
+                            return palavraInvalida();
                         }
                         break;
 
@@ -269,9 +267,8 @@ public:
                         if (ch == 'N') { lexema += ch; estado = 47; }
                         else if (ch == 'M') { lexema += ch; estado = 48; }
                         else {
-                            arq->devolverCaracter(); estado = 1;
-                            cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                            lexema = "";
+                            arq.devolverCaracter();
+                            return palavraInvalida();
                         }
                         break;
 
@@ -279,9 +276,8 @@ public:
                     case 'R':
                         if (ch == 'E') { lexema += ch; estado = 55; }
                         else {
-                            arq->devolverCaracter(); estado = 1;
-                            cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                            lexema = "";
+                            arq.devolverCaracter();
+                            return palavraInvalida();
                         }
                         break;
 
@@ -289,9 +285,8 @@ public:
                     case 'L':
                         if (ch == 'E') { lexema += ch; estado = 58; }
                         else {
-                            arq->devolverCaracter(); estado = 1;
-                            cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                            lexema = "";
+                            arq.devolverCaracter();
+                            return palavraInvalida();
                         }
                         break;
 
@@ -300,9 +295,8 @@ public:
                     case 'S':
                         if (ch == 'E') { lexema += ch; estado = 72; }
                         else {
-                            arq->devolverCaracter(); estado = 1;
-                            cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                            lexema = "";
+                            arq.devolverCaracter();
+                            return palavraInvalida();
                         }
                         break;
 
@@ -312,15 +306,12 @@ public:
                     case 'E':
                         if (ch == 'N') { lexema += ch; estado = 63; }
                         else if (!isalpha(ch) && !isdigit(ch) && ch != '_') {
-                            arq->devolverCaracter();
-                            (*id)++;
-                            estado = 1;
-                            return new Token(lexema, "OpBoolE");
+                            arq.devolverCaracter();
+                            return emitir(lexema, "OpBoolE");
                         }
                         else {
-                            arq->devolverCaracter(); estado = 1;
-                            cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                            lexema = "";
+                            arq.devolverCaracter();
+                            return palavraInvalida();
                         }
                         break;
 
@@ -328,9 +319,8 @@ public:
                     case 'F':
                         if (ch == 'I') { lexema += ch; estado = 68; }
                         else {
-                            arq->devolverCaracter(); estado = 1;
-                            cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                            lexema = "";
+                            arq.devolverCaracter();
+                            return palavraInvalida();
                         }
                         break;
 
@@ -338,14 +328,11 @@ public:
                     case 'O':
                         if (ch == 'U') {
                             lexema += ch;
-                            (*id)++;
-                            estado = 1;
-                            return new Token(lexema, "OpBoolOu");
+                            return emitir(lexema, "OpBoolOu");
                         }
                         else {
-                            arq->devolverCaracter(); estado = 1;
-                            cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                            lexema = "";
+                            arq.devolverCaracter();
+                            return palavraInvalida();
                         }
                         break;
 
@@ -353,11 +340,9 @@ public:
                         if (isalpha(ch) || isdigit(ch) || ch == '_') {
                             lexema += ch;
                         } else {
-                            arq->devolverCaracter(); estado = 1;
-                            cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                            lexema = "";
+                            arq.devolverCaracter();
+                            return palavraInvalida();
                         }
-                        break;
                 }
                 continue;
             }
@@ -365,125 +350,99 @@ public:
             // D => [E ja consumido no dispatch] => C
             // Estado 42: leu 'DE', espera 'C'
             if (estado == 42) {
-                if (ch == 'C') { lexema += ch; (*id)++; estado = 1; return new Token(lexema, "PCDec"); }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                if (ch == 'C') { lexema += ch; return emitir(lexema, "PCDec"); }
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // P => [R ja consumido] => O => G
             // Estado 44: leu 'PR', espera 'O'
             if (estado == 44) {
                 if (ch == 'O') { lexema += ch; estado = 45; continue; }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // Estado 45: leu 'PRO', espera 'G'
             if (estado == 45) {
-                if (ch == 'G') { lexema += ch; (*id)++; estado = 1; return new Token(lexema, "PCProg"); }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                if (ch == 'G') { lexema += ch; return emitir(lexema, "PCProg"); }
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // I => [N ja consumido] => T / I
             // Estado 47: leu 'IN', espera 'T' (INT) ou 'I' (INI)
             if (estado == 47) {
-                if (ch == 'T') { lexema += ch; (*id)++; estado = 1; return new Token(lexema, "PCInt"); }
-                if (ch == 'I') { lexema += ch; (*id)++; estado = 1; return new Token(lexema, "PCIni"); }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                if (ch == 'T') { lexema += ch; return emitir(lexema, "PCInt"); }
+                if (ch == 'I') { lexema += ch; return emitir(lexema, "PCIni"); }
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // I => [M ja consumido] => P => R => I => M => I => R
             // Estado 48: leu 'IM', espera 'P'
             if (estado == 48) {
                 if (ch == 'P') { lexema += ch; estado = 49; continue; }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // Estado 49: leu 'IMP', espera 'R'
             if (estado == 49) {
                 if (ch == 'R') { lexema += ch; estado = 50; continue; }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // Estado 50: leu 'IMPR', espera 'I'
             if (estado == 50) {
                 if (ch == 'I') { lexema += ch; estado = 51; continue; }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // Estado 51: leu 'IMPRI', espera 'M'
             if (estado == 51) {
                 if (ch == 'M') { lexema += ch; estado = 52; continue; }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // Estado 52: leu 'IMPRIM', espera 'I'
             if (estado == 52) {
                 if (ch == 'I') { lexema += ch; estado = 53; continue; }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // Estado 53: leu 'IMPRIMI', espera 'R'
             if (estado == 53) {
-                if (ch == 'R') { lexema += ch; (*id)++; estado = 1; return new Token(lexema, "PCImprimir"); }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                if (ch == 'R') { lexema += ch; return emitir(lexema, "PCImprimir"); }
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // R => [E ja consumido] => A => L
             // Estado 55: leu 'RE', espera 'A'
             if (estado == 55) {
                 if (ch == 'A') { lexema += ch; estado = 56; continue; }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // Estado 56: leu 'REA', espera 'L'
             if (estado == 56) {
-                if (ch == 'L') { lexema += ch; (*id)++; estado = 1; return new Token(lexema, "PCReal"); }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                if (ch == 'L') { lexema += ch; return emitir(lexema, "PCReal"); }
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // L => [E ja consumido] => R
             // Estado 58: leu 'LE', espera 'R'
             if (estado == 58) {
-                if (ch == 'R') { lexema += ch; (*id)++; estado = 1; return new Token(lexema, "PCLer"); }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                if (ch == 'R') { lexema += ch; return emitir(lexema, "PCLer"); }
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // S => [E ja consumido] => aceita SE  ou  => N => A => O (SENAO)
@@ -491,33 +450,25 @@ public:
             if (estado == 72) {
                 if (ch == 'N') { lexema += ch; estado = 60; continue; }
                 if (!isalpha(ch) && !isdigit(ch) && ch != '_') {
-                    arq->devolverCaracter();
-                    (*id)++;
-                    estado = 1;
-                    return new Token(lexema, "PCSe");
+                    arq.devolverCaracter();
+                    return emitir(lexema, "PCSe");
                 }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // Estado 60: leu 'SEN', espera 'A'
             if (estado == 60) {
                 if (ch == 'A') { lexema += ch; estado = 61; continue; }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // Estado 61: leu 'SENA', espera 'O'
             if (estado == 61) {
-                if (ch == 'O') { lexema += ch; (*id)++; estado = 1; return new Token(lexema, "PCSenao"); }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                if (ch == 'O') { lexema += ch; return emitir(lexema, "PCSenao"); }
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // E => [N ja consumido] => T => A => O  (ENTAO)
@@ -526,84 +477,72 @@ public:
             if (estado == 63) {
                 if (ch == 'T') { lexema += ch; estado = 64; continue; }
                 if (ch == 'Q') { lexema += ch; estado = 65; continue; }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // Estado 64: leu 'ENT', espera 'A'
             if (estado == 64) {
                 if (ch == 'A') { lexema += ch; estado = 70; continue; }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // Estado 70: leu 'ENTA', espera 'O'
             if (estado == 70) {
-                if (ch == 'O') { lexema += ch; (*id)++; estado = 1; return new Token(lexema, "PCEntao"); }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                if (ch == 'O') { lexema += ch; return emitir(lexema, "PCEntao"); }
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // Estado 65: leu 'ENQ', espera 'T'
             if (estado == 65) {
                 if (ch == 'T') { lexema += ch; estado = 66; continue; }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // Estado 66: leu 'ENQT', espera 'O'
             if (estado == 66) {
-                if (ch == 'O') { lexema += ch; (*id)++; estado = 1; return new Token(lexema, "PCEnqto"); }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                if (ch == 'O') { lexema += ch; return emitir(lexema, "PCEnqto"); }
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
             // F => [I ja consumido] => M
             // Estado 68: leu 'FI', espera 'M'
             if (estado == 68) {
-                if (ch == 'M') { lexema += ch; (*id)++; estado = 1; return new Token(lexema, "PCFim"); }
-                arq->devolverCaracter(); estado = 1;
-                cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (variaveis devem comecar com letra minuscula)" << endl;
-                lexema = "";
-                continue;
+                if (ch == 'M') { lexema += ch; return emitir(lexema, "PCFim"); }
+                arq.devolverCaracter();
+                return palavraInvalida();
             }
 
         } // fim while
 
         // trata tokens pendentes ao atingir fim do arquivo
-        if (estado == 2)  { (*id)++; return new Token("<", "OpRelMenor"); }
-        if (estado == 7)  { (*id)++; return new Token(">", "OpRelMaior"); }
-        if (estado == 12) { (*id)++; return new Token(":", "Delim"); }
-        if (estado == 30) { (*id)++; return new Token(lexema, "NumInt"); }
-        if (estado == 31) { (*id)++; return new Token(lexema, "NumReal"); }
+        if (estado == 2)  { return emitir("<", "OpRelMenor"); }
+        if (estado == 7)  { return emitir(">", "OpRelMaior"); }
+        if (estado == 12) { return emitir(":", "Delim"); }
+        if (estado == 30) { return emitir(lexema, "NumInt"); }
+        if (estado == 31) { return emitir(lexema, "NumReal"); }
 
         if (estado == 40 && !lexema.empty() && islower(lexema[0])) {
-            (*id)++;
-            return new Token(lexema, "Var");
+            return emitir(lexema, "Var");
         }
 
         // 'E' sozinho no EOF
         if (estado == 40 && !lexema.empty() && lexema[0] == 'E') {
-            (*id)++;
-            return new Token(lexema, "OpBoolE");
+            return emitir(lexema, "OpBoolE");
         }
 
         // 'SE' no EOF
-        if (estado == 72) { (*id)++; return new Token(lexema, "PCSe"); }
+        if (estado == 72) { return emitir(lexema, "PCSe"); }
 
-        // palavras-chave incompletas no EOF
+        if (estado == 5)  { return erro("=", "'=' isolado nao e um token valido"); }
+        if (estado == 10) { return erro("!", "'!' isolado nao e um token valido"); }
+        if (estado == 20) { return erro("\"" + lexema, "cadeia de caracteres nao fechada"); }
         if (estado >= 40 && !lexema.empty()) {
-            cerr << "Erro Lexico: identificador invalido \"" << lexema << "\" (fim de arquivo inesperado)" << endl;
+            return palavraInvalida();
         }
 
         return nullptr;
